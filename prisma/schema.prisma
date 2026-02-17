@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model AppointmentType {
+  id          String        @id @default(cuid())
+  name        String
+  duration    Int           // duration in minutes
+  active      Boolean       @default(true)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  appointments Appointment[]
+
+  @@map("appointment_types")
+}
+
+enum AppointmentStatus {
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Appointment {
+  id                String            @id @default(cuid())
+  clientName        String            @map("client_name")
+  clientPhone       String            @map("client_phone")
+  clientEmail       String?           @map("client_email")
+  appointmentTypeId String            @map("appointment_type_id")
+  appointmentType   AppointmentType   @relation(fields: [appointmentTypeId], references: [id])
+  startTime         DateTime          @map("start_time")
+  endTime           DateTime          @map("end_time")
+  status            AppointmentStatus @default(CONFIRMED)
+  googleEventId     String?           @map("google_event_id")
+  whatsappOptIn     Boolean           @default(false) @map("whatsapp_opt_in")
+  reminderSent      Boolean           @default(false) @map("reminder_sent")
+  notes             String?
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  @@index([startTime])
+  @@index([status])
+  @@map("appointments")
+}
+
+model WeeklySchedule {
+  id        String   @id @default(cuid())
+  dayOfWeek Int      @map("day_of_week") // 0=Sunday, 1=Monday, ..., 6=Saturday
+  startTime String   @map("start_time")  // HH:mm format
+  endTime   String   @map("end_time")    // HH:mm format
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("weekly_schedules")
+}
+
+model BlockedDate {
+  id        String   @id @default(cuid())
+  date      DateTime @db.Date
+  reason    String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([date])
+  @@map("blocked_dates")
+}
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+
+  @@map("settings")
+}

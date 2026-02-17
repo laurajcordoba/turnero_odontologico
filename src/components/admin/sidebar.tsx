@@ -9,13 +9,17 @@ import {
   Clock,
   Settings,
   LogOut,
+  Heart,
+  MessageCircle,
 } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/turnos", label: "Turnos", icon: Calendar },
+  { href: "/admin/implantes", label: "Solicitudes Implantes", icon: MessageCircle },
   { href: "/admin/horarios", label: "Horarios", icon: Clock },
   { href: "/admin/tipos-turno", label: "Tipos de turno", icon: Settings },
+  { href: "/admin/obras-sociales", label: "Obras sociales", icon: Heart },
 ];
 
 export function Sidebar() {

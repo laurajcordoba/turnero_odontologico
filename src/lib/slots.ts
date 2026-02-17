@@ -13,26 +13,54 @@ export async function getAvailableSlots(
   const timezone = settingsMap["timezone"] || "America/Argentina/Buenos_Aires";
   const minNoticeHours = parseInt(settingsMap["min_booking_notice_hours"] || "2");
 
-  // Parse target date in Argentina timezone
-  const targetDate = new Date(dateStr + "T00:00:00");
   const dayOfWeek = getArgentinaDayOfWeek(dateStr);
+
+  const targetDateStart = new Date(dateStr + "T00:00:00.000Z");
+  const targetDateEnd = new Date(dateStr + "T23:59:59.999Z");
 
   // 1. Check if date is blocked
   const blocked = await prisma.blockedDate.findFirst({
     where: {
-      date: targetDate,
+      date: {
+        gte: targetDateStart,
+        lte: targetDateEnd,
+      },
     },
   });
   if (blocked) return [];
 
-  // 2. Get weekly schedule for this day
-  const scheduleBlocks = await prisma.weeklySchedule.findMany({
+  // 2. Prefer date-specific schedule over weekly
+  const dateBlocks = await prisma.dateSchedule.findMany({
     where: {
-      dayOfWeek,
-      active: true,
+      date: {
+        gte: targetDateStart,
+        lte: targetDateEnd,
+      },
     },
     orderBy: { startTime: "asc" },
   });
+
+  let scheduleBlocks: { startTime: string; endTime: string }[];
+
+  if (dateBlocks.length > 0) {
+    scheduleBlocks = dateBlocks.map((b) => ({
+      startTime: b.startTime,
+      endTime: b.endTime,
+    }));
+  } else {
+    const weekly = await prisma.weeklySchedule.findMany({
+      where: {
+        dayOfWeek,
+        active: true,
+      },
+      orderBy: { startTime: "asc" },
+    });
+    scheduleBlocks = weekly.map((b) => ({
+      startTime: b.startTime,
+      endTime: b.endTime,
+    }));
+  }
+
   if (scheduleBlocks.length === 0) return [];
 
   // 3. Generate candidate slots

@@ -3,7 +3,7 @@
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, User, Phone } from "lucide-react";
+import { Calendar, Clock, User, Phone, Mail, MapPin, CreditCard, Heart } from "lucide-react";
 import type { BookingData } from "./booking-wizard";
 
 interface Props {
@@ -41,10 +41,42 @@ export function StepConfirm({
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <CreditCard className="w-5 h-5 text-gray-400" />
+          <div>
+            <p className="text-sm text-gray-500">DNI</p>
+            <p className="font-medium text-gray-900">{data.clientDni}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
           <Phone className="w-5 h-5 text-gray-400" />
           <div>
-            <p className="text-sm text-gray-500">Telefono</p>
+            <p className="text-sm text-gray-500">Teléfono</p>
             <p className="font-medium text-gray-900">{data.clientPhone}</p>
+          </div>
+        </div>
+        {data.clientEmail && (
+          <div className="flex items-center gap-3">
+            <Mail className="w-5 h-5 text-gray-400" />
+            <div>
+              <p className="text-sm text-gray-500">Email</p>
+              <p className="font-medium text-gray-900">{data.clientEmail}</p>
+            </div>
+          </div>
+        )}
+        {data.clientLocation && (
+          <div className="flex items-center gap-3">
+            <MapPin className="w-5 h-5 text-gray-400" />
+            <div>
+              <p className="text-sm text-gray-500">Sede</p>
+              <p className="font-medium text-gray-900">{data.clientLocation}</p>
+            </div>
+          </div>
+        )}
+        <div className="flex items-center gap-3">
+          <Heart className="w-5 h-5 text-gray-400" />
+          <div>
+            <p className="text-sm text-gray-500">Obra social</p>
+            <p className="font-medium text-gray-900">{data.obraSocialName || "Particular"}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">

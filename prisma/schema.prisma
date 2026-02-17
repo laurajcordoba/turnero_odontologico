@@ -30,6 +30,18 @@ model AppointmentType {
   @@map("appointment_types")
 }
 
+model ObraSocial {
+  id        String        @id @default(cuid())
+  name      String
+  active    Boolean       @default(true)
+  sedes     String[]      @default([]) // direcciones donde atiende: LOCATION_OPTIONS
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  appointments Appointment[]
+
+  @@map("obra_social")
+}
+
 enum AppointmentStatus {
   CONFIRMED
   CANCELLED
@@ -39,8 +51,12 @@ enum AppointmentStatus {
 model Appointment {
   id                String            @id @default(cuid())
   clientName        String            @map("client_name")
+  clientDni         String            @map("client_dni")
   clientPhone       String            @map("client_phone")
   clientEmail       String?           @map("client_email")
+  clientLocation    String?           @map("client_location")
+  obraSocialId      String?           @map("obra_social_id")
+  obraSocial        ObraSocial?       @relation(fields: [obraSocialId], references: [id])
   appointmentTypeId String            @map("appointment_type_id")
   appointmentType   AppointmentType   @relation(fields: [appointmentTypeId], references: [id])
   startTime         DateTime          @map("start_time")
@@ -80,10 +96,34 @@ model BlockedDate {
   @@map("blocked_dates")
 }
 
+model DateSchedule {
+  id        String   @id @default(cuid())
+  date      DateTime @db.Date
+  startTime String   @map("start_time")
+  endTime   String   @map("end_time")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("date_schedules")
+}
+
 model Setting {
   id    String @id @default(cuid())
   key   String @unique
   value String
 
   @@map("settings")
+}
+
+model ImplantesRequest {
+  id             String   @id @default(cuid())
+  clientName     String   @map("client_name")
+  clientDni      String   @map("client_dni")
+  clientPhone    String   @map("client_phone")
+  clientEmail    String?  @map("client_email")
+  clientLocation String?  @map("client_location")
+  obraSocialName String?  @map("obra_social_name")
+  notes          String?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("implantes_requests")
 }

@@ -33,7 +33,7 @@ export async function PATCH(
   const updated = await prisma.appointment.update({
     where: { id },
     data: { status },
-    include: { appointmentType: true },
+    include: { appointmentType: true, obraSocial: true },
   });
 
   return NextResponse.json(updated);

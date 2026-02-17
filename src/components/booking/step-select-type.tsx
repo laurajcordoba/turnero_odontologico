@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Clock } from "lucide-react";
+import { Clock, MessageCircle } from "lucide-react";
+import { IMPLANTES_TYPE_ID } from "./step-implantes-request";
 import type { BookingData } from "./booking-wizard";
 
 interface AppointmentType {
@@ -36,7 +37,16 @@ export function StepSelectType({ data, updateData, onNext, onBack }: Props) {
     updateData({
       appointmentTypeId: type.id,
       appointmentTypeName: type.name,
-      // Reset date/time when type changes
+      date: "",
+      time: "",
+    });
+    onNext();
+  }
+
+  function selectImplantes() {
+    updateData({
+      appointmentTypeId: IMPLANTES_TYPE_ID,
+      appointmentTypeName: "Implantes",
       date: "",
       time: "",
     });
@@ -69,6 +79,20 @@ export function StepSelectType({ data, updateData, onNext, onBack }: Props) {
               </span>
             </button>
           ))}
+          <button
+            onClick={selectImplantes}
+            className={`flex items-center justify-between p-4 rounded-lg border-2 transition-colors text-left ${
+              data.appointmentTypeId === IMPLANTES_TYPE_ID
+                ? "border-blue-600 bg-blue-50"
+                : "border-gray-200 hover:border-blue-300"
+            }`}
+          >
+            <span className="font-medium text-gray-900">Implantes</span>
+            <span className="flex items-center gap-1 text-sm text-amber-600">
+              <MessageCircle className="w-4 h-4" />
+              Coordinación por WhatsApp
+            </span>
+          </button>
         </div>
       )}
       <div className="flex justify-between pt-6">

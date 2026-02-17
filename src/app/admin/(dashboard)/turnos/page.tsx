@@ -12,8 +12,11 @@ import { toast } from "sonner";
 interface Appointment {
   id: string;
   clientName: string;
+  clientDni: string;
   clientPhone: string;
   clientEmail: string | null;
+  clientLocation: string | null;
+  obraSocial: { id: string; name: string } | null;
   startTime: string;
   endTime: string;
   status: "CONFIRMED" | "CANCELLED" | "COMPLETED";

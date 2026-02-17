@@ -14,12 +14,42 @@ function ConfirmacionContent() {
   const type = searchParams.get("type") || "";
   const date = searchParams.get("date") || "";
   const time = searchParams.get("time") || "";
+  const isImplantes = searchParams.get("implantes") === "1";
 
   const dateDisplay = date
     ? format(new Date(date + "T12:00:00"), "EEEE d 'de' MMMM yyyy", {
         locale: es,
       })
     : "";
+
+  if (isImplantes) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="w-8 h-8 text-green-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Solicitud enviada
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Hemos recibido su solicitud de turno para <strong>Implantes</strong>.
+            Un coordinador lo contactará por WhatsApp para acordar fecha, horario
+            y sede. No es necesario realizar ninguna otra acción.
+          </p>
+          <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+            <div className="flex items-center gap-3">
+              <User className="w-5 h-5 text-gray-400" />
+              <span className="text-sm text-gray-700">{name}</span>
+            </div>
+          </div>
+          <Link href="/">
+            <Button className="w-full">Volver al inicio</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">

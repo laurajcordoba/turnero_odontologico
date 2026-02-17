@@ -7,11 +7,16 @@ import { StepClientInfo } from "./step-client-info";
 import { StepSelectType } from "./step-select-type";
 import { StepSelectDateTime } from "./step-select-datetime";
 import { StepConfirm } from "./step-confirm";
+import { StepImplantesRequest, isImplantesRequest } from "./step-implantes-request";
 
 export interface BookingData {
   clientName: string;
+  clientDni: string;
   clientPhone: string;
   clientEmail: string;
+  clientLocation: string;
+  obraSocialId: string;
+  obraSocialName: string;
   appointmentTypeId: string;
   appointmentTypeName: string;
   date: string;
@@ -22,8 +27,12 @@ export interface BookingData {
 
 const INITIAL_DATA: BookingData = {
   clientName: "",
+  clientDni: "",
   clientPhone: "",
   clientEmail: "",
+  clientLocation: "",
+  obraSocialId: "",
+  obraSocialName: "",
   appointmentTypeId: "",
   appointmentTypeName: "",
   date: "",
@@ -65,8 +74,11 @@ export function BookingWizard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           clientName: data.clientName,
+          clientDni: data.clientDni,
           clientPhone: data.clientPhone,
           clientEmail: data.clientEmail,
+          clientLocation: data.clientLocation,
+          obraSocialId: data.obraSocialId === "particular" ? null : data.obraSocialId,
           appointmentTypeId: data.appointmentTypeId,
           date: data.date,
           time: data.time,
@@ -138,14 +150,16 @@ export function BookingWizard() {
             onBack={back}
           />
         )}
-        {step === 2 && (
+        {step === 2 && isImplantesRequest(data.appointmentTypeId) ? (
+          <StepImplantesRequest data={data} onBack={back} />
+        ) : step === 2 ? (
           <StepSelectDateTime
             data={data}
             updateData={updateData}
             onNext={next}
             onBack={back}
           />
-        )}
+        ) : null}
         {step === 3 && (
           <StepConfirm
             data={data}

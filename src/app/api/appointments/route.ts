@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
   const appointments = await prisma.appointment.findMany({
     where,
-    include: { appointmentType: true },
+    include: { appointmentType: true, obraSocial: true },
     orderBy: { startTime: "asc" },
   });
 
@@ -44,7 +44,24 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { clientName, clientPhone, clientEmail, appointmentTypeId, date, time, whatsappOptIn, notes } = parsed.data;
+  const { clientName, clientDni, clientPhone, clientEmail, clientLocation, obraSocialId, appointmentTypeId, date, time, whatsappOptIn, notes } = parsed.data;
+
+  // Validate obra social if provided
+  let finalObraSocialId: string | null = null;
+  let obraSocialDisplayName = "Particular";
+  if (obraSocialId) {
+    const obra = await prisma.obraSocial.findUnique({
+      where: { id: obraSocialId },
+    });
+    if (!obra || !obra.active) {
+      return NextResponse.json(
+        { error: "Obra social no disponible" },
+        { status: 400 }
+      );
+    }
+    finalObraSocialId = obraSocialId;
+    obraSocialDisplayName = obra.name;
+  }
 
   // Get appointment type
   const appointmentType = await prisma.appointmentType.findUnique({
@@ -80,7 +97,7 @@ export async function POST(req: NextRequest) {
   try {
     googleEventId = await createEvent({
       summary: `Turno: ${clientName} - ${appointmentType.name}`,
-      description: `Paciente: ${clientName}\nTelefono: ${clientPhone}${clientEmail ? `\nEmail: ${clientEmail}` : ""}${notes ? `\nNotas: ${notes}` : ""}`,
+      description: `Paciente: ${clientName}\nDNI: ${clientDni}\nTelefono: ${clientPhone}${clientEmail ? `\nEmail: ${clientEmail}` : ""}${clientLocation ? `\nSede: ${clientLocation}` : ""}\nObra social: ${obraSocialDisplayName}${notes ? `\nNotas: ${notes}` : ""}`,
       startTime,
       endTime,
     });
@@ -92,8 +109,11 @@ export async function POST(req: NextRequest) {
   const appointment = await prisma.appointment.create({
     data: {
       clientName,
+      clientDni,
       clientPhone,
       clientEmail: clientEmail || null,
+      clientLocation: clientLocation || null,
+      obraSocialId: finalObraSocialId,
       appointmentTypeId,
       startTime,
       endTime,
